@@ -1,0 +1,299 @@
+@import "~normalize.css";
+@import "~@blueprintjs/core/lib/css/blueprint.css";
+@import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+@import "~@blueprintjs/popover2/lib/css/blueprint-popover2.css";
+@import "~@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
+
+.leaflet-container {
+  position: absolute;
+  right: 0;
+  width: calc(100vw - 300px);
+  height: 100vh;
+}
+
+.leaflet-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #0fa8d2;
+  // background-image: url(../../public/pobrane.jpg);
+  // background-position: center;
+  // background-size: cover;
+  // filter: hue-rotate(215deg) brightness(50%);
+}
+
+:focus {
+  outline: 0px;
+  outline-offset: 0px;
+}
+
+.sideUi {
+  position: fixed;
+  height: 100vh;
+  width: 300px;
+  background-color: #2f343c;
+
+  &__panelStack {
+    border-top: 1px solid rgb(82, 82, 82);
+    padding-top: 10px;
+  }
+}
+
+.zIndex {
+  z-index: 251254;
+}
+.bp4-popover2-transition-container {
+  z-index: 21412412;
+}
+.bp4-transition-container {
+  z-index: 21341235123;
+}
+.marker {
+  position: relative;
+  transform: translateX(7px) translateY(-36px);
+
+  & svg {
+    transform: translateX(-9.5px) translateY(7px);
+  }
+
+  & img {
+    position: absolute;
+    opacity: 70%;
+    transform: translateX(-17px) translateY(-17px);
+    z-index: -1;
+  }
+  &__background {
+    position: absolute;
+    margin-bottom: 55px;
+    content: "";
+    top: 0;
+    right: -4px;
+    width: 35px;
+    height: 35px;
+    z-index: -1;
+    // color: #5a5a5a28;
+
+    border: 1px solid rgba(0, 0, 0, 0.092);
+    border-top-left-radius: 50%;
+    border-top-right-radius: 50% 100%;
+    border-bottom-left-radius: 100% 50%;
+    border-bottom-right-radius: 0%;
+    transform: rotate(45deg);
+  }
+  &--preview {
+    display: flex;
+    height: 55px;
+    align-items: center;
+    position: relative;
+    & svg {
+      z-index: 2;
+      position: absolute;
+      top: 8px;
+      right: 9px;
+    }
+    &--after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 35px;
+      height: 35px;
+
+      border: 1px solid rgba(0, 0, 0, 0.092);
+      border-top-left-radius: 50%;
+      border-top-right-radius: 50% 100%;
+      border-bottom-left-radius: 100% 50%;
+      border-bottom-right-radius: 0%;
+      transform: rotate(45deg);
+    }
+  }
+}
+
+.leaflet-div-icon {
+  background: none;
+  border: none;
+}
+
+.leaflet-overlay-pane {
+  z-index: unset;
+}
+// .leaflet-pane {
+//   z-index: unset;
+// }
+
+#overlay {
+  z-index: 25125125;
+
+  & div {
+    z-index: 2512521;
+  }
+}
+
+.edit_popup {
+  width: 260px;
+}
+.overlay {
+  z-index: 12412412;
+  &Animate {
+    &-enter {
+      opacity: 0;
+    }
+    &-enter-active {
+      opacity: 1;
+      transition: opacity 200ms;
+    }
+    &-exit {
+      opacity: 1;
+    }
+    &-exit-active {
+      opacity: 0;
+      transition: opacity 200ms;
+    }
+    transition: all 0.5s linear;
+  }
+}
+
+.editOverlay {
+  width: max-content;
+  height: max-content;
+}
+
+.bp4-panel-stack2 {
+  height: 100%;
+}
+
+.authBox {
+  width: 300px;
+  // height: 350px;
+}
+
+.bp4-dialog {
+  padding: 0;
+}
+
+.toaster {
+  z-index: 12541212;
+}
+
+@mixin tool {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  border-bottom: 1px solid #ccc;
+  text-align: center;
+  transition: all 0.3s linear;
+  position: relative;
+  z-index: 450;
+}
+
+.tools-navbar {
+  position: absolute;
+  top: 10%;
+  left: 312px;
+  z-index: 450;
+  font-size: 12px;
+  display: flex;
+  flex-flow: column;
+  cursor: pointer;
+
+  &__tool {
+    color: #0fa8d294;
+    background-color: #fff;
+
+    @include tool;
+    &__submenu {
+      position: absolute;
+      cursor: default;
+      overflow: hidden;
+      color: rgba(255, 255, 255, 0.927);
+      font-size: 12px;
+      padding-inline: 10px;
+      line-height: 22px;
+      width: max-content;
+      top: 2.5px;
+      left: 30px;
+      height: 25px;
+      background-color: rgba(0, 0, 0, 0.628);
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
+      border-top: 1px solid rgba(255, 255, 255, 0.55);
+      border-right: 1px solid rgba(255, 255, 255, 0.55);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+      z-index: -1;
+
+      &__link {
+        cursor: pointer;
+        transition: all 0.1s linear;
+        &:hover {
+          color: #15ccff94;
+        }
+      }
+    }
+    &--selected {
+      background-color: #15ccff94;
+      color: white;
+      @include tool;
+      &:hover {
+        background-color: #25edfbc8;
+        color: white;
+      }
+    }
+
+    &:hover {
+      color: #15ccff94;
+      background-color: rgb(230, 228, 228);
+    }
+  }
+}
+
+.fix-slider-height {
+  height: 16px;
+}
+
+.leaflet-pather {
+  z-index: 12425215;
+  position: absolute;
+}
+div.leaflet-container.mode-edit div.elbow {
+  cursor: move;
+  pointer-events: all;
+  background-color: orangered;
+}
+
+.elbow {
+  transition: background-color 0.25s;
+  border: 2px solid white;
+  outline: none;
+  box-shadow: 0 0 3px rgb(0 0 0 / 10%);
+  border-radius: 50%;
+  pointer-events: none;
+  background-color: #555;
+}
+
+.markerEdit {
+  max-width: 355px;
+  &__iconColorBar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  &__icons {
+    width: 316px;
+
+    &__popover {
+      width: 316px;
+      max-height: 200px;
+      overflow-y: scroll;
+    }
+  }
+  &__textArea {
+    min-width: 316px;
+    width: 100%;
+    margin-top: 10px;
+    min-height: 100px;
+    margin-bottom: 10px;
+  }
+}

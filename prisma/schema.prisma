@@ -1,0 +1,135 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator nexusPrisma {
+  provider = "nexus-prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EntityTypes {
+  MARKER
+  AREA
+  PATH
+}
+
+model Entity {
+  id          String      @id @default(cuid())
+  type        EntityTypes
+  name        String
+  description String?
+  image       String?
+  color       String
+  icon        String
+  position    Json
+  createdAt   DateTime    @default(now()) @map(name: "created_at")
+  createdBy   User        @relation("CreatedEntities", fields: [createdById], references: [id])
+  createdById String
+  folder      Folder      @relation(fields: [folderId], references: [id])
+  folderId    String
+  updatedAt   DateTime    @updatedAt @map(name: "updated_at")
+  updatedBy   User?       @relation("UpdatedEntities", fields: [updatedById], references: [id])
+  updatedById String?
+}
+
+model Folder {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  color       String
+  icon        String
+  entities    Entity[]
+  childs      Folder[] @relation("FolderTree")
+  parent      Folder?  @relation("FolderTree", fields: [parentId], references: [id])
+  parentId    String?
+  createdBy   User     @relation("FoldersCreated", fields: [createdById], references: [id])
+  createdById String
+  mapRoot     Map?     @relation(name: "RootFolder")
+  map         Map?     @relation(name: "AllFolders", fields: [mapId], references: [id])
+  mapId       String?
+}
+
+model Map {
+  id           String   @id @default(cuid())
+  createdBy    User     @relation(fields: [createdById], references: [id])
+  createdById  String
+  name         String
+  description  String?
+  color        String
+  icon         String
+  rootFolder   Folder   @relation(name: "RootFolder", fields: [rootFolderId], references: [id])
+  rootFolderId String   @unique
+  folders      Folder[] @relation(name: "AllFolders")
+  editors      User[]   @relation("EditorsGroup", references: [id])
+  users        User[]   @relation("UsersGroup", references: [id])
+}
+
+///////////////////////////////////////////////////
+///               User Schema                   ///
+///////////////////////////////////////////////////
+
+model User {
+  id              String    @id @default(cuid())
+  name            String?
+  username        String?   @unique
+  email           String?   @unique
+  emailVerified   DateTime?
+  password        String?
+  createdAt       DateTime  @default(now()) @map(name: "created_at")
+  updatedAt       DateTime  @updatedAt @map(name: "updated_at")
+  createdEntities Entity[]  @relation("CreatedEntities")
+  updatedEntities Entity[]  @relation("UpdatedEntities")
+  editorAt        Map[]     @relation("EditorsGroup", references: [id])
+  userAt          Map[]     @relation("UsersGroup", references: [id])
+  mapsCreated     Map[]
+  image           String?
+  accounts        Account[]
+  sessions        Session[]
+  foldersCreated  Folder[]  @relation("FoldersCreated")
+
+  @@map(name: "users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+///              End of user schema             ///
