@@ -27,4 +27,5 @@ yarn-error.log*
 /public/tiles
 /public/tilest
 /public/uploads
+Testnig.tsx
 
