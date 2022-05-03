@@ -4,6 +4,7 @@ import { Entity } from "./Entity";
 import { ApolloError } from "apollo-server-micro";
 import { resolve } from "path";
 import { isEmpty } from "lodash-es";
+import { Folder as FolderType } from "../../src/types";
 
 export const Folder = objectType({
   name: "Folder",
@@ -167,6 +168,84 @@ export const FoldersMutation = extendType({
                 id: _args.parentFolder,
               },
             },
+          },
+        });
+      },
+    });
+    t.field("deleteFolder", {
+      type: Folder,
+      args: {
+        folderId: nonNull(idArg()),
+      },
+      async resolve(_parent, _args, ctx) {
+        if (!ctx.user) throw new ApolloError("Unauthorized", "401");
+
+        const folder = await ctx.prisma.folder.findUnique({
+          where: {
+            id: _args.folderId,
+          },
+          include: {
+            mapRoot: true,
+            childs: {
+              include: {
+                childs: {
+                  include: {
+                    childs: {
+                      include: { childs: { include: { childs: true } } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        });
+        if (isEmpty(folder))
+          return new ApolloError("Nie znaleziono folderu", "409");
+
+        const mapId = folder?.mapId || folder?.mapRoot?.id;
+        const map = await ctx.prisma.map.findUnique({
+          where: {
+            id: mapId,
+          },
+          include: {
+            editors: true,
+          },
+        });
+
+        const token = await ctx.accessToken;
+        if (
+          map?.createdById !== token.sub &&
+          !map?.editors.some((current) => current.id === token.sub)
+        )
+          throw new ApolloError("Unauthorized", "401");
+
+        if (folder?.childs && folder?.childs.length > 0) {
+          const recursiveDelete = async (childs: FolderType[]) => {
+            childs.forEach(async (currentFolder: FolderType) => {
+              if (currentFolder.childs && currentFolder.childs.length > 0)
+                recursiveDelete(currentFolder.childs);
+              await ctx.prisma.entity.deleteMany({
+                where: {
+                  folderId: currentFolder.id,
+                },
+              });
+              await ctx.prisma.folder.delete({
+                where: {
+                  id: currentFolder.id,
+                },
+              });
+            });
+          };
+          recursiveDelete(folder.childs as FolderType[]);
+        }
+        await ctx.prisma.entity.deleteMany({
+          where: {
+            folderId: _args.folderId,
+          },
+        });
+        return await ctx.prisma.folder.delete({
+          where: {
+            id: _args.folderId,
           },
         });
       },

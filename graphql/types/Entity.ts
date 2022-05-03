@@ -143,5 +143,43 @@ export const EntityMutation = extendType({
         });
       },
     });
+    t.field("deleteEntity", {
+      type: Entity,
+      args: {
+        id: nonNull(idArg()),
+      },
+      async resolve(_parent, _args, ctx) {
+        if (!ctx.user) throw new ApolloError("Unauthorized", "401");
+        const entity = await ctx.prisma.entity.findUnique({
+          where: {
+            id: _args.id,
+          },
+        });
+        if (isEmpty(entity)) return new ApolloError("Nie znaleziono", "409");
+
+        const mapId = entity?.mapId;
+        const map = await ctx.prisma.map.findUnique({
+          where: {
+            id: mapId,
+          },
+          include: {
+            editors: true,
+          },
+        });
+
+        const token = await ctx.accessToken;
+        if (
+          map?.createdById !== token.sub &&
+          !map?.editors.some((current) => current.id === token.sub)
+        )
+          throw new ApolloError("Unauthorized", "401");
+
+        return await ctx.prisma.entity.delete({
+          where: {
+            id: _args.id,
+          },
+        });
+      },
+    });
   },
 });

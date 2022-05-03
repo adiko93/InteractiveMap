@@ -82,6 +82,8 @@ type Mutation {
   createEntity(color: String!, description: String, folder: ID!, icon: String!, image: String, name: String!, position: Json!, type: EntityType!): Entity
   createFolder(color: String!, icon: String!, name: String!, parentFolder: ID!): Folder
   createUser(password: String!, username: String!): User
+  deleteEntity(id: ID!): Entity
+  deleteFolder(folderId: ID!): Folder
 }
 
 type Query {

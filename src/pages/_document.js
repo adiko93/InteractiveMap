@@ -17,7 +17,7 @@ export default function Document() {
           crossOrigin=""
         />
       </Head>
-      <body>
+      <body className="bp4-dark">
         <Main />
         <NextScript />
       </body>

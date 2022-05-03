@@ -9,9 +9,10 @@ import {
   PanelProps,
   Menu,
   MenuItem,
+  Alert,
 } from "@blueprintjs/core";
 import { useMapContext } from "../../context/MapContext";
-import { Folder } from "../../types";
+import { EntityType, Folder } from "../../types";
 import {
   EntitiesState,
   useEntitiesContext,
@@ -21,14 +22,59 @@ import { icon } from "leaflet";
 import { useOverlayContext } from "../../context/OverlayContext";
 import { ContextMenu2, ContextMenu2ChildrenProps } from "@blueprintjs/popover2";
 import { type } from "os";
+import { useMutation } from "@apollo/client";
+import {
+  deleteEnitityGQL,
+  deleteFolderGQL,
+} from "../../../graphql/client/mutations";
+import { AppToaster } from "../Toaster";
+
+interface ClickedContext {
+  node: EntitiesState;
+  path: number[];
+}
 
 export const FoldersPanel: React.FC<PanelProps<{ mapId: string }>> = () => {
+  const [isAlertOpened, setIsAlertOpened] = React.useState(false);
   const { mapState, mapDispatch } = useMapContext();
   const [test, setTest] = React.useState(false);
   const { entitiesDispatch, entitiesState } = useEntitiesContext();
   const { overlayDispatch } = useOverlayContext();
-  const [clickedContext, setClicedContext] = React.useState();
+  const [clickedContext, setClickedContext] =
+    React.useState<ClickedContext | null>(null);
   const tree = React.useRef(null);
+  const [deleteFolder] = useMutation(deleteFolderGQL, {
+    onCompleted() {
+      AppToaster?.show({
+        intent: Intent.SUCCESS,
+        message: "Pomyślnie usunięto folder i jego zawartość",
+      });
+      setIsAlertOpened(false);
+      if (mapState.refetchFolders) mapState.refetchFolders();
+    },
+    onError(error) {
+      AppToaster?.show({
+        intent: Intent.DANGER,
+        message: `Wystąpił błąd ${error}`,
+      });
+      setIsAlertOpened(false);
+    },
+  });
+  const [deleteEntity] = useMutation(deleteEnitityGQL, {
+    onCompleted() {
+      AppToaster?.show({
+        intent: Intent.SUCCESS,
+        message: "Pomyślnie usunięto",
+      });
+      if (mapState.refetchFolders) mapState.refetchFolders();
+    },
+    onError(error) {
+      AppToaster?.show({
+        intent: Intent.DANGER,
+        message: `Wystąpił błąd ${error}`,
+      });
+    },
+  });
 
   const handleNodeClick = React.useCallback(
     (
@@ -36,7 +82,6 @@ export const FoldersPanel: React.FC<PanelProps<{ mapId: string }>> = () => {
       nodePath: NodePath,
       e: React.MouseEvent<HTMLElement>
     ) => {
-      console.log(node);
       if ((node as EntitiesState).nodeData?.type === "ADDFOLDER") {
         overlayDispatch({
           type: "openFolderEditOverlay",
@@ -91,7 +136,7 @@ export const FoldersPanel: React.FC<PanelProps<{ mapId: string }>> = () => {
     []
   );
 
-  const contextMenu = (type) => {
+  const contextMenu = (type: EntityType | "FOLDER" | "ADDFOLDER") => {
     switch (type) {
       case "FOLDER":
         return (
@@ -100,7 +145,7 @@ export const FoldersPanel: React.FC<PanelProps<{ mapId: string }>> = () => {
               icon="trash"
               text={`Usuń folder`}
               onClick={() => {
-                // markers.addMarker(clickedPosition)
+                setIsAlertOpened(true);
               }}
             />
             <MenuItem
@@ -119,7 +164,11 @@ export const FoldersPanel: React.FC<PanelProps<{ mapId: string }>> = () => {
               icon="trash"
               text={`Usuń marker`}
               onClick={() => {
-                // markers.addMarker(clickedPosition)
+                deleteEntity({
+                  variables: {
+                    deleteEntityId: clickedContext?.node.id,
+                  },
+                });
               }}
             />
             <MenuItem
@@ -136,12 +185,28 @@ export const FoldersPanel: React.FC<PanelProps<{ mapId: string }>> = () => {
 
   return (
     <div>
+      <Alert
+        isOpen={isAlertOpened}
+        cancelButtonText="Anuluj"
+        confirmButtonText="Usuń"
+        intent={Intent.DANGER}
+        onConfirm={() =>
+          deleteFolder({ variables: { folderId: clickedContext!.node.id } })
+        }
+        onCancel={() => setIsAlertOpened(false)}
+        icon="trash"
+        style={{
+          padding: "10px",
+        }}
+      >
+        <p>Jesteś pewny że chcesz usunąć ten folder i całą jego zawartość?</p>
+      </Alert>
       <ContextMenu2
         onContextMenu={(event) => {
           console.log(event);
         }}
         content={
-          <Menu>{contextMenu(clickedContext?.node?.nodeData?.type)}</Menu>
+          <Menu>{contextMenu(clickedContext?.node?.nodeData?.type!)}</Menu>
         }
       >
         {(ctxMenuProps: ContextMenu2ChildrenProps) => {
@@ -151,8 +216,8 @@ export const FoldersPanel: React.FC<PanelProps<{ mapId: string }>> = () => {
                 contents={entitiesState}
                 onNodeClick={handleNodeClick}
                 onNodeContextMenu={(node, path, e) => {
-                  setClicedContext({
-                    node,
+                  setClickedContext({
+                    node: node as EntitiesState,
                     path,
                   });
                   ctxMenuProps.onContextMenu(e);

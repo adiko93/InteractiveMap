@@ -20,8 +20,4 @@ export interface Entity {
   folder?: Folder;
 }
 
-export enum EntityType {
-  "MARKER",
-  "AREA",
-  "PATH",
-}
+export type EntityType = "MARKER" | "AREA" | "PATH";

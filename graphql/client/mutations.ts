@@ -51,3 +51,19 @@ export const createFolderGQL = gql`
     }
   }
 `;
+
+export const deleteFolderGQL = gql`
+  mutation DeleteFolder($folderId: ID!) {
+    deleteFolder(folderId: $folderId) {
+      id
+    }
+  }
+`;
+
+export const deleteEnitityGQL = gql`
+  mutation DeleteEntity($deleteEntityId: ID!) {
+    deleteEntity(id: $deleteEntityId) {
+      id
+    }
+  }
+`;

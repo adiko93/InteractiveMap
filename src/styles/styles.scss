@@ -11,6 +11,10 @@
   height: 100vh;
 }
 
+.bp4-overlay {
+  z-index: 3000;
+}
+
 .leaflet-container::before {
   content: "";
   position: absolute;

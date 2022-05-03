@@ -40,3 +40,5 @@ build
 public/tiles
 public/tilest
 public/uploads
+bower_components
+.next

@@ -32,6 +32,8 @@ model Entity {
   createdAt   DateTime    @default(now()) @map(name: "created_at")
   createdBy   User        @relation("CreatedEntities", fields: [createdById], references: [id])
   createdById String
+  map         Map         @relation(fields: [mapId], references: [id])
+  mapId       String
   folder      Folder      @relation(fields: [folderId], references: [id])
   folderId    String
   updatedAt   DateTime    @updatedAt @map(name: "updated_at")
@@ -67,6 +69,7 @@ model Map {
   rootFolder   Folder   @relation(name: "RootFolder", fields: [rootFolderId], references: [id])
   rootFolderId String   @unique
   folders      Folder[] @relation(name: "AllFolders")
+  entities     Entity[]
   editors      User[]   @relation("EditorsGroup", references: [id])
   users        User[]   @relation("UsersGroup", references: [id])
 }

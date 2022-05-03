@@ -70,7 +70,7 @@ async function main() {
     },
   });
 
-  const getRandomMarkers = (number) => {
+  const getRandomMarkers = (number, mapId) => {
     const array = [];
     for (let i = 1; i <= number; i++) {
       array.push({
@@ -78,6 +78,7 @@ async function main() {
         type: "MARKER",
         position: getRandomPosition(),
         createdBy: { connect: { id: user.id } },
+        map: { connect: { id: mapId } },
       });
     }
     return array;
@@ -92,14 +93,36 @@ async function main() {
           createdBy: {
             connect: { id: user.id },
           },
-          entities: {
-            create: getRandomMarkers(5),
-          },
         },
       },
       createdBy: {
         connect: { id: user.id },
       },
+    },
+  });
+
+  await prisma.entity.create({
+    data: {
+      ...getRandomMarkers(1, map1.id)[0],
+      folder: { connect: { id: map1.rootFolderId } },
+    },
+  });
+  await prisma.entity.create({
+    data: {
+      ...getRandomMarkers(1, map1.id)[0],
+      folder: { connect: { id: map1.rootFolderId } },
+    },
+  });
+  await prisma.entity.create({
+    data: {
+      ...getRandomMarkers(1, map1.id)[0],
+      folder: { connect: { id: map1.rootFolderId } },
+    },
+  });
+  await prisma.entity.create({
+    data: {
+      ...getRandomMarkers(1, map1.id)[0],
+      folder: { connect: { id: map1.rootFolderId } },
     },
   });
   const map2 = await prisma.map.create({
@@ -111,14 +134,36 @@ async function main() {
           createdBy: {
             connect: { id: user.id },
           },
-          entities: {
-            create: getRandomMarkers(5),
-          },
         },
       },
       createdBy: {
         connect: { id: user.id },
       },
+    },
+  });
+
+  await prisma.entity.create({
+    data: {
+      ...getRandomMarkers(1, map2.id)[0],
+      folder: { connect: { id: map2.rootFolderId } },
+    },
+  });
+  await prisma.entity.create({
+    data: {
+      ...getRandomMarkers(1, map2.id)[0],
+      folder: { connect: { id: map2.rootFolderId } },
+    },
+  });
+  await prisma.entity.create({
+    data: {
+      ...getRandomMarkers(1, map2.id)[0],
+      folder: { connect: { id: map2.rootFolderId } },
+    },
+  });
+  await prisma.entity.create({
+    data: {
+      ...getRandomMarkers(1, map2.id)[0],
+      folder: { connect: { id: map2.rootFolderId } },
     },
   });
 
@@ -132,7 +177,7 @@ async function main() {
         },
       },
       entities: {
-        create: getRandomMarkers(5),
+        create: getRandomMarkers(5, map1.id),
       },
       createdBy: {
         connect: { id: user.id },
@@ -150,7 +195,7 @@ async function main() {
               connect: { id: user.id },
             },
             entities: {
-              create: getRandomMarkers(3),
+              create: getRandomMarkers(3, map1.id),
             },
             childs: {
               create: [
@@ -165,7 +210,7 @@ async function main() {
                     connect: { id: user.id },
                   },
                   entities: {
-                    create: getRandomMarkers(3),
+                    create: getRandomMarkers(3, map1.id),
                   },
                 },
                 {
@@ -179,7 +224,7 @@ async function main() {
                     connect: { id: user.id },
                   },
                   entities: {
-                    create: getRandomMarkers(5),
+                    create: getRandomMarkers(5, map1.id),
                   },
                 },
               ],
@@ -203,7 +248,7 @@ async function main() {
         connect: { id: user.id },
       },
       entities: {
-        create: getRandomMarkers(5),
+        create: getRandomMarkers(5, map1.id),
       },
       childs: {
         create: [
@@ -218,7 +263,7 @@ async function main() {
               connect: { id: user.id },
             },
             entities: {
-              create: getRandomMarkers(3),
+              create: getRandomMarkers(3, map1.id),
             },
             childs: {
               create: [
@@ -233,7 +278,7 @@ async function main() {
                     connect: { id: user.id },
                   },
                   entities: {
-                    create: getRandomMarkers(3),
+                    create: getRandomMarkers(3, map1.id),
                   },
                 },
                 {
@@ -247,7 +292,7 @@ async function main() {
                     connect: { id: user.id },
                   },
                   entities: {
-                    create: getRandomMarkers(5),
+                    create: getRandomMarkers(5, map1.id),
                   },
                 },
               ],
@@ -264,7 +309,7 @@ async function main() {
               connect: { id: user.id },
             },
             entities: {
-              create: getRandomMarkers(3),
+              create: getRandomMarkers(3, map1.id),
             },
             childs: {
               create: [
@@ -279,7 +324,7 @@ async function main() {
                     connect: { id: user.id },
                   },
                   entities: {
-                    create: getRandomMarkers(3),
+                    create: getRandomMarkers(3, map1.id),
                   },
                 },
                 {
@@ -293,7 +338,7 @@ async function main() {
                     connect: { id: user.id },
                   },
                   entities: {
-                    create: getRandomMarkers(5),
+                    create: getRandomMarkers(5, map1.id),
                   },
                 },
               ],
@@ -314,7 +359,7 @@ async function main() {
         },
       },
       entities: {
-        create: getRandomMarkers(5),
+        create: getRandomMarkers(5, map2.id),
       },
       createdBy: {
         connect: { id: user.id },
@@ -332,7 +377,7 @@ async function main() {
               connect: { id: user.id },
             },
             entities: {
-              create: getRandomMarkers(3),
+              create: getRandomMarkers(3, map2.id),
             },
             childs: {
               create: [
@@ -347,7 +392,7 @@ async function main() {
                     connect: { id: user.id },
                   },
                   entities: {
-                    create: getRandomMarkers(3),
+                    create: getRandomMarkers(3, map2.id),
                   },
                 },
                 {
@@ -361,7 +406,7 @@ async function main() {
                     connect: { id: user.id },
                   },
                   entities: {
-                    create: getRandomMarkers(5),
+                    create: getRandomMarkers(5, map2.id),
                   },
                 },
               ],
@@ -385,7 +430,7 @@ async function main() {
         connect: { id: user.id },
       },
       entities: {
-        create: getRandomMarkers(5),
+        create: getRandomMarkers(5, map2.id),
       },
       childs: {
         create: [
@@ -400,7 +445,7 @@ async function main() {
               connect: { id: user.id },
             },
             entities: {
-              create: getRandomMarkers(3),
+              create: getRandomMarkers(3, map2.id),
             },
             childs: {
               create: [
@@ -415,7 +460,7 @@ async function main() {
                     connect: { id: user.id },
                   },
                   entities: {
-                    create: getRandomMarkers(3),
+                    create: getRandomMarkers(3, map2.id),
                   },
                 },
                 {
@@ -429,7 +474,7 @@ async function main() {
                     connect: { id: user.id },
                   },
                   entities: {
-                    create: getRandomMarkers(5),
+                    create: getRandomMarkers(5, map2.id),
                   },
                 },
               ],
@@ -446,7 +491,7 @@ async function main() {
               connect: { id: user.id },
             },
             entities: {
-              create: getRandomMarkers(3),
+              create: getRandomMarkers(3, map2.id),
             },
             childs: {
               create: [
@@ -461,7 +506,7 @@ async function main() {
                     connect: { id: user.id },
                   },
                   entities: {
-                    create: getRandomMarkers(3),
+                    create: getRandomMarkers(3, map2.id),
                   },
                 },
                 {
@@ -475,7 +520,7 @@ async function main() {
                     connect: { id: user.id },
                   },
                   entities: {
-                    create: getRandomMarkers(5),
+                    create: getRandomMarkers(5, map2.id),
                   },
                 },
               ],
