@@ -102,13 +102,43 @@ const EntitiesReducer = (
     case "SET_SELECT_VISIBLE":
       const newState4 = cloneDeep(state);
       const nodeProps = action.payload.props;
-      forNodeAtPath(
-        newState4,
-        nodeProps.path,
-        (node) =>
-          (node.nodeData.isVisible =
-            node.nodeData.isVisible === "CHECKED" ? "UNCHECKED" : "CHECKED")
-      );
+      // forNodeAtPath(
+      //   newState4,
+      //   nodeProps.path,
+      //   (node) =>
+      //     (node.nodeData.isVisible =
+      //       node.nodeData.isVisible === "CHECKED" ? "UNCHECKED" : "CHECKED")
+      // );
+
+      const recursiveFolderCheck = (folder: EntitiesState, check: boolean) => {
+        const tempFolder = cloneDeep(folder);
+        if (tempFolder.childNodes) {
+          tempFolder.childNodes.forEach((node, index) => {
+            recursiveFolderCheck(node, check);
+          });
+        }
+        tempFolder.nodeData.isVisible = check ? "CHECKED" : "UNCHECKED";
+        // console.log(tempFolder);
+        return tempFolder;
+      };
+
+      if (action.payload.isFolder) {
+        forNodeAtPath(newState4, nodeProps.path, (node) => {
+          node = recursiveFolderCheck(
+            node,
+            nodeProps.nodeData.isVisible === "UNCHECKED" ? true : false
+          );
+          console.log(node);
+        });
+      } else {
+        forNodeAtPath(
+          newState4,
+          nodeProps.path,
+          (node) =>
+            (node.nodeData.isVisible =
+              node.nodeData.isVisible === "CHECKED" ? "UNCHECKED" : "CHECKED")
+        );
+      }
       // TODO:  Indeterminate Checkboxes
       //   const recursiveSelect = (folder: EntitiesState) => {
       //     folder.childNodes?.forEach((node) => {
@@ -132,6 +162,7 @@ const EntitiesReducer = (
       //   newState4.forEach(
       //     (node) => (node.nodeData.isVisible = !node.nodeData.isVisible)
       //   );
+      console.log(newState4);
       return newState4;
     default:
       return state;
@@ -175,20 +206,20 @@ export const EntitiesContextProvider: React.FC = ({ children }) => {
           />
         ),
         // TODO:  Indeterminate Checkboxes
-        // secondaryLabel: (props) => {
-        //   return (
-        //     <Checkbox
-        //       checked={props.nodeData.isVisible}
-        //       onChange={() =>
-        //         entitiesDispatch({
-        //           type: "SET_SELECT_VISIBLE",
-        //           payload: { props, isFolder: true },
-        //         })
-        //       }
-        //       style={{ marginBottom: "0" }}
-        //     />
-        //   );
-        // },
+        secondaryLabel: (props) => {
+          return (
+            <Checkbox
+              checked={props.nodeData.isVisible === "CHECKED"}
+              onChange={() =>
+                entitiesDispatch({
+                  type: "SET_SELECT_VISIBLE",
+                  payload: { props, isFolder: true },
+                })
+              }
+              style={{ marginBottom: "0" }}
+            />
+          );
+        },
         childNodes: renderFolder(folder),
         isExpanded: false,
         hasCaret: true,

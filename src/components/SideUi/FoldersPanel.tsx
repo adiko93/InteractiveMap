@@ -43,6 +43,7 @@ export const FoldersPanel: React.FC<PanelProps<{ mapId: string }>> = () => {
   const [clickedContext, setClickedContext] =
     React.useState<ClickedContext | null>(null);
   const tree = React.useRef(null);
+
   const [deleteFolder] = useMutation(deleteFolderGQL, {
     onCompleted() {
       AppToaster?.show({
@@ -60,6 +61,7 @@ export const FoldersPanel: React.FC<PanelProps<{ mapId: string }>> = () => {
       setIsAlertOpened(false);
     },
   });
+
   const [deleteEntity] = useMutation(deleteEnitityGQL, {
     onCompleted() {
       AppToaster?.show({
