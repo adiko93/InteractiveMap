@@ -8,32 +8,20 @@ This project allows users to create their own instance of map, adding markers, z
 
   - [x] Create account
   - [x] E-mail/password
-  - [ ] Google OAuth - todo after deployment
-  - [ ] Facebook OAuth - todo
-  - [ ] Twitch OAuth - todo
 
 - CRUD
 
   - [x] Create/Read/Delete folders
   - [x] Create/Read/Delete markers
-  - [ ] Create/Read/Delete/Update zones
-  - [ ] Create/Read/Delete/Update paths
-  - [ ] Update Folders
-  - [ ] Update Markers
 
 - Tools
 
   - [x] Tool NavBar
   - [x] Add Markers
   - [x] Add Zones 70%
-  - [ ] Add Paths
 
 - Additional functions
   - [x] Display Map
-  - [ ] Indeterminate checkboxes - Currently working on
-  - [ ] Notification system
-  - [ ] Share map instances with read/edit permissions
-  - [ ] Share coordinates
 
 ## Getting started
 
